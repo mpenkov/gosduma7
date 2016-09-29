@@ -1,11 +1,12 @@
-Evaluating Results of the 2016 State Duma Elections in Russia
-=============================================================
+Dataset: Results of the 2016 State Duma Elections in Russia
+===========================================================
 
 I scraped the results from izbirkom.ru. They are free to use for any purpose.
 The results are [here](https://github.com/mpenkov/gosduma7/blob/master/scrapyproject/results.json).
 The format is one JSON object per line.
 
-You can see an example of working with the dataset [here](https://github.com/mpenkov/gosduma7/blob/master/Elections%20to%20the%20State%20Duma%202016.ipynb).
+You can see an example of working with the dataset [here](https://github.com/mpenkov/gosduma7/blob/master/Introduction.ipynb).
+I used the dataset to recreate [graphs](https://github.com/mpenkov/gosduma7/blob/master/Introduction.ipynb) found elsewhere on the Internet, with varying levels of success.
 
 If you find a bug, please let me know.
 
