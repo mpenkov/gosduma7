@@ -45,14 +45,22 @@ SINGLE_RESULTS_REGEX = re.compile(
 #
 TEST = False
 
+TIK_XPATH = "/html/body/table[2]/tr[4]/td/table[5]/tr/td[2]/div/table/tr[1]/td/nobr/a"  # noqa
+"""Get the territorial electoral committee links."""
+
+UIK_XPATH = "/html/body/table[2]/tr[2]/td/a"
+"""Get the link to the UIK table from a TIK table."""
+
+TURNOUT_TIK_XPATH = "/html/body/table[2]/tr[4]/td/table[4]/tr/td[2]/a"
+"""Get the territorial electoral committee links for turnout pages."""
+
 
 def get_uik_link(selector):
     #
     # Для просмотра данных по участковым избирательным комиссиям перейдите
     # на сайт избирательной комиссии субъекта Российской Федерации
     #
-    xp = "/html/body/table[2]/tr[2]/td/a"
-    uik_link = selector.xpath(xp)
+    uik_link = selector.xpath(UIK_XPATH)
     return uik_link.xpath("./@href").extract_first()
 
 
@@ -118,8 +126,7 @@ class MyspiderSpider(scrapy.Spider):
         #
         # Link to each individual electoral commission
         #
-        xp = "/html/body/table[2]/tr[4]/td/table[5]/tr/td[2]/div/table/tr[1]/td[1]/nobr/a"  # noqa
-        ik_links = response.selector.xpath(xp)
+        ik_links = response.selector.xpath(TIK_XPATH)
         for link in ik_links:
             href = link.xpath("./@href").extract_first()
             yield scrapy.Request(href, callback=self.__parse_federal_table_ik)
@@ -138,8 +145,7 @@ class MyspiderSpider(scrapy.Spider):
 
     def __parse_turnout_table(self, response):
         meth_name = "__parse_turnout_table"
-        xp = "/html/body/table[2]/tr[4]/td/table[4]/tr[4]/td[2]/a"
-        ik_links = response.selector.xpath(xp)
+        ik_links = response.selector.xpath(TURNOUT_TIK_XPATH)
         self.logger.debug("%s: len(ik_links): %d", meth_name, len(ik_links))
         for link in ik_links:
             href = link.xpath("./@href").extract_first()
@@ -584,3 +590,39 @@ class RegexTest(unittest.TestCase):
     def test_turnout(self):
         text = "Предварительные сведения об участии избирателей в выборах"
         self.assertIsNotNone(TURNOUT_REGEX.search(text))
+
+
+class XpathTest(unittest.TestCase):
+
+    def test_tik(self):
+        response = mock_response("test_parse.html")
+        tik_links = response.selector.xpath(TIK_XPATH)
+        tik_names = [join(tl.xpath(".//text()").extract()) for tl in tik_links]
+
+        self.assertEqual(
+            tik_names,
+            [
+                "Адыгейская", "Гиагинская", "Кошехабльская",
+                "Красногвардейская", "Майкопская", "Майкопская городская",
+                "Тахтамукайская", "Теучежская", "Шовгеновская"
+            ]
+        )
+
+    def test_uik(self):
+        response = mock_response("test_parse_tik.html")
+        uik_link = get_uik_link(response.selector)
+        self.assertIsNotNone(uik_link)
+
+    def test_turnout_tik(self):
+        response = mock_response("test_parse_turnout.html")
+        tik_links = response.selector.xpath(TURNOUT_TIK_XPATH)
+        tik_names = [join(tl.xpath(".//text()").extract()) for tl in tik_links]
+
+        self.assertEqual(
+            tik_names,
+            [
+                "Адыгейская", "Гиагинская", "Кошехабльская",
+                "Красногвардейская", "Майкопская", "Майкопская городская",
+                "Тахтамукайская", "Теучежская", "Шовгеновская"
+            ]
+        )
