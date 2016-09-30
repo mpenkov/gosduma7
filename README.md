@@ -13,9 +13,7 @@ If you find a bug, please let me know.
 Repeating the Scrape
 --------------------
 
-Some of the results data was not final when I ran the scrape on Sep 21.
-
-You can obtain the most recent data by repeating the scrape:
+If you want to fetch the data by yourself, you can repeat the scrape:
 
     cd scrapyproject
     scrapy runspider -t lines gosduma7/spiders/myspider.py -o results.json
